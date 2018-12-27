@@ -1,12 +1,53 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import SeasonDisplay from "./SeasonDisplay";
+import Spinner from './Spinner';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class App extends React.Component {
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+    state = { lat: null, errorMessage: '' };
+
+    componentDidMount() {
+        window.navigator.geolocation.getCurrentPosition(
+
+            (position) => this.setState({ lat: position.coords.latitude }),
+            (err) => this.setState({ errorMessage: err.message })
+
+        );
+
+        console.log("Component was rendered to the screen----Did Mount");
+    }
+
+    componentDidUpdate() {
+        console.log("Component was updated-- Re-rendered-----Did Update");
+    }
+
+    renderContent() {
+        if (this.state.errorMessage && !this.state.lat) {
+            return <div>Error:{this.state.errorMessage}</div>
+        }
+
+        if (!this.state.errorMessage && this.state.lat) {
+            return <SeasonDisplay lat={this.state.lat}></SeasonDisplay>
+        }
+
+        return <Spinner message="Please accept the location" />;
+
+    };
+
+
+    render() {                                                              //executed(2)
+         console.log("Render executed");
+        //conditional rendering
+        return (
+            <div className="border-red">{this.renderContent()}</div>
+        );
+
+    };
+
+}
+ReactDOM.render(
+    <App />,
+    document.querySelector('#root')
+
+);
